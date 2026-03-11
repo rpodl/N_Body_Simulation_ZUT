@@ -9,6 +9,7 @@ fi
 NUM_BODIES=$1
 NUM_ITERS=$2
 EXECUTABLE=./simulation
+MODE=C
 
 # Output file
 OUT_FILE="cpu_energy_results.csv"
@@ -25,7 +26,7 @@ echo "  Iterations: $NUM_ITERS"
 # Run and measure energy
 RESULT=$(perf stat -x, \
     -e power/energy-pkg/ \
-    $EXECUTABLE $NUM_BODIES $NUM_ITERS 2>&1)
+    $EXECUTABLE $NUM_BODIES $NUM_ITERS $MODE 2>&1)
 
 # Extract energy (Joules)
 ENERGY=$(echo "$RESULT" | grep "energy-pkg" | awk -F, '{print $1}')

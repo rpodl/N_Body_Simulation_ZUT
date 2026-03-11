@@ -1,12 +1,18 @@
 #!/bin/bash
 
-if [ "$#" -ne 2 ]; then
-    echo "Usage: $0 <num_bodies> <num_steps>"
-    exit 1
+if [ "$#" -ne 3 ]; then 
+    echo "Usage: $0 <num_bodies> <num_steps> <G|GB>" 
+    exit 1 
 fi
 
 NUM_BODIES=$1
 NUM_STEPS=$2
+MODE=$3
+
+if [[ "$MODE" != "G" && "$MODE" != "GB" ]]; then 
+    echo "Error: Mode must be G (GPU) or GB (GPU Barnes-Hut)" 
+    exit 1 
+fi
 
 SIMULATION="./simulation"
 LOGFILE="gpu_log.csv"
