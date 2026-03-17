@@ -3,8 +3,21 @@ Plik NBody.cpp zawiera symulacje problemu n-ciał metodą All-Pairs zaimplemento
 Plik NBody.cu zawiera symulacje problemu n-ciał metodą All-Pairs zaimplementowaną na karcie graficznej z użyciem CUDA oraz symulacje problemu n-ciał metodą Barnes - Hut zaimplementowaną heterogeniczne na procesorze oraz karcie graficznej.
 
 Sposób użycia 
+
 program uruchamiamy podając 3 parametry:
 - liczbę ciał
 - liczbę kroków
 - Flagę C dla symulacji na procesorze, G dla symulacji na karcie graficznej oraz GB dla symulacji Barnes - Hut.
 
+Pliki EnergyCheckCPU oraz EnergyCheckGPU służą do badania zużycia energetycznego poprzez narzędzia perf oraz nvidia-smi.
+
+Sposób użycia
+
+EnergyCheckCPU odapalamy podając dwa parametry:
+- liczbę ciał.
+- liczbę kroków.
+
+EnergyCheckGPU odpalamy podając trzy parametry:
+- liczbę ciał.
+- liczbę kroków.
+- Flagę G dla symulacji All - Pairs oraz GB dla symulacji Barnes - Hut.
