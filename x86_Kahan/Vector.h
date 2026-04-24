@@ -14,10 +14,12 @@ public:
     double mod() const {
         return std::sqrt(px * px + py * py + pz * pz);
     }
-
     Vector operator+(const Vector& rhs) const {
-        return Vector(sumGM(px, rhs.px), sumGM(py, rhs.py), sumGM(pz, rhs.pz));
+        return Vector(px + rhs.px, py + rhs.py, pz + rhs.pz);
     }
+    /*Vector operator+(const Vector& rhs) const {
+        return Vector(sumGM(px, rhs.px), sumGM(py, rhs.py), sumGM(pz, rhs.pz));
+    }*/
     Vector operator-(const Vector& rhs) const {
         return Vector(px - rhs.px, py - rhs.py, pz - rhs.pz);
     }
