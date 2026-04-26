@@ -4,6 +4,7 @@ Plik NBody.cu zawiera symulacje problemu n-ciał metodą All-Pairs zaimplementow
 
 Sposób użycia 
 
+W celu przetestowania programu na dużym zbiorze danych:
 program uruchamiamy podając 3 parametry:
 - liczbę ciał
 - liczbę kroków
@@ -21,3 +22,6 @@ EnergyCheckGPU odpalamy podając trzy parametry:
 - liczbę ciał.
 - liczbę kroków.
 - Flagę G dla symulacji All - Pairs oraz GB dla symulacji Barnes - Hut.
+
+W celu przetestowania programu pod względem dokładności obliczeniowej na przykładzie testu keplera:
+program odpalamy z użyciem flagi -k
