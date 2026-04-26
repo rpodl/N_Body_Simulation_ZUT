@@ -5,8 +5,14 @@
 
 int main(int argc, char *argv[]) {
 
+     if (argc == 2 && std::string(argv[1]) == "-k") {
+        NBody simulation(100, 100.0);
+        simulation.simulateKeplerTest();
+        return 0;
+    }
+
     if (argc < 4) {
-        std::cout << "Usage: " << argv[0] << " N steps [C|G|GB]\n";
+        std::cout << "Usage: " << argv[0] << " N steps [C|G|GB] or -k for kepler test\n";
         return 1;
     }
 
@@ -29,6 +35,5 @@ int main(int argc, char *argv[]) {
         std::cout << "Unknown mode. Use C, G, or GB.\n";
         return 1;
     }
-
     return 0;
 }

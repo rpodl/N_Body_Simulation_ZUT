@@ -35,6 +35,28 @@ Body randBody(std::mt19937_64 &gen) {
     return { mass, pos, vel };
 }
 
+NBody::NBody(int steps, double orbitRadius) : gc(1.0), bodies(2), timeSteps(steps) {
+    masses.resize(2);
+    positions.resize(2);
+    velocities.resize(2);
+    accelerations.resize(2, ORIGIN);
+
+    const double M = 1.0;
+    const double r = orbitRadius;
+    const double separation = 2.0 * r;
+    const double v = std::sqrt(gc * M / (4.0 * r));
+
+    masses[0] = M;
+    positions[0]  = Vector( r, 0.0, 0.0);
+    velocities[0] = Vector(0.0,  v, 0.0);
+
+    masses[1] = M;
+    positions[1]  = Vector(-r, 0.0, 0.0);
+    velocities[1] = Vector(0.0, -v, 0.0);
+
+    std::cout << "=== Keplerian two-body test ===\n" << "G = " << gc << " | M = " << M << " | orbit radius r = " << r << " | separation = " << separation << "\n" << "Circular speed v = " << v << "\n" << "Orbital period T = " << (2.0 * M_PI * r / v) << "  (in sim time-units)\n"<< "Steps = " << timeSteps << "\n\n";
+}
+
 std::vector<Body> generateRandomBodies(int n, unsigned long long seed) {
     std::mt19937_64 gen(seed);
     std::vector<Body> bodies;
@@ -97,8 +119,8 @@ void NBody::resolveCollisions() {
     }
 */
 
-/*
-    void NBody::computeAccelerations() { // wersja Kahan
+
+   void NBody::computeAccelerations() { // wersja Kahan
         #pragma omp parallel for
         for (int i = 0; i < bodies; ++i) {
             accelerations[i] = ORIGIN;
@@ -122,7 +144,7 @@ void NBody::resolveCollisions() {
                     double xy, yy, zy;
 
                     xtemp=xs; xy=ax+xe; xs=xtemp+xy; xe=(xtemp-xs)+xy;
-                    ytemp=xs; yy=ay+ye; ys=ytemp+yy; ye=(ytemp-ys)+yy;
+                    ytemp=ys; yy=ay+ye; ys=ytemp+yy; ye=(ytemp-ys)+yy;
                     ztemp=zs; zy=az+ze; zs=ztemp+zy; ze=(ztemp-zs)+zy;
                     
 
@@ -136,9 +158,9 @@ void NBody::resolveCollisions() {
         }
     }
 
-*/
 
-    void NBody::computeAccelerations() { // wersja Gill-Moller
+
+/*  void NBody::computeAccelerations() { // wersja Gill-Moller
         #pragma omp parallel for
         for (int i = 0; i < bodies; ++i) {
             accelerations[i] = ORIGIN;
@@ -170,7 +192,7 @@ void NBody::resolveCollisions() {
 
             }
         }
-    }
+    }*/
 
 
     void NBody::computeVelocities() {
@@ -239,5 +261,43 @@ void NBody::resolveCollisions() {
 	    std::cout <<"Czas Procesor\t" << std::setprecision(10) << es.count() <<std::endl;
     }
     
+    void NBody::simulateKeplerTest() {
+    const double M  = masses[0];
+    const double r  = positions[0].mod();
+    const double v0 = velocities[0].mod();
+    const double omega = v0 / r;
     
+    std::cout << std::left
+              << std::setw(8)  << "Step"
+              << std::setw(22) << "Pos error (body 0)"
+              << "\n";
+    std::cout << std::string(74, '-') << "\n";
+
+    const auto wallStart = std::chrono::steady_clock::now();
+
+    for (int step = 1; step <= timeSteps; ++step) {
+        computeAccelerations();
+        computePositions();
+        computeVelocities();
+
+        const double theta = omega * step;
+        Vector exact0(r * std::cos(theta), r * std::sin(theta), 0.0);
+
+        const double posErr = (positions[0] - exact0).mod();
+
+
+        if (step % std::max(1, timeSteps / 200) == 0 || step == 1) {
+            std::cout << std::left
+                      << std::setw(8)  << step
+                      << std::setw(22) << std::setprecision(6) << posErr
+                      << "\n";
+        }
+    }
+
+    const auto wallEnd = std::chrono::steady_clock::now();
+    const std::chrono::duration<double> elapsed{wallEnd - wallStart};
+
+    std::cout << "\nSimulation time: " << std::setprecision(10)
+              << elapsed.count() << " s\n";
+}
 
