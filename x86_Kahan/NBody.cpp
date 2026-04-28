@@ -103,6 +103,25 @@ void NBody::resolveCollisions() {
     }
 }
 
+double NBody::computeEnergy() {
+
+    double KE = 0.0;
+    for (int i = 0; i < bodies; ++i) {
+        double v2 = velocities[i].mod() * velocities[i].mod();
+        KE += 0.5 * masses[i] * v2;
+    }
+
+    double PE = 0.0;
+    for (int i = 0; i < bodies; ++i) {
+        for (int j = i + 1; j < bodies; ++j) {
+            double dist = (positions[i] - positions[j]).mod();
+            PE += -gc * masses[i] * masses[j] / dist;
+        }
+    }
+
+    return KE + PE;
+}
+
 /*
     void NBody::computeAccelerations() { //wersja oryginalna
         #pragma omp parallel for
@@ -299,5 +318,45 @@ void NBody::resolveCollisions() {
 
     std::cout << "\nSimulation time: " << std::setprecision(10)
               << elapsed.count() << " s\n";
+}
+
+void NBody::simulateEnergyTest() {
+
+    const double E0 = computeEnergy();
+
+    std::cout << "Initial energy E0 = " << std::setprecision(15) << E0 << "\n\n";
+
+    std::cout << std::left
+              << std::setw(8)  << "Step"
+              << std::setw(28) << "Abs energy drift |E-E0|"
+              << std::setw(28) << "Rel energy drift |E-E0|/|E0|"
+              << "\n"
+              << std::string(64, '-') << "\n";
+
+    const auto wallStart = std::chrono::steady_clock::now();
+
+    for (int step = 1; step <= timeSteps; ++step) {
+
+        computeAccelerations();
+        computePositions();
+        computeVelocities();
+
+        const double E    = computeEnergy();
+        const double absE = std::abs(E - E0);
+        const double relE = absE / std::abs(E0);
+
+        if (step % std::max(1, timeSteps / 200) == 0 || step == 1) {
+            std::cout << std::left
+                      << std::setw(8)  << step
+                      << std::setw(28) << std::setprecision(6) << absE
+                      << std::setw(28) << std::setprecision(6) << relE
+                      << "\n";
+        }
+    }
+
+     const auto wallEnd = std::chrono::steady_clock::now();
+    const std::chrono::duration<double> elapsed{wallEnd - wallStart};
+    std::cout << "\nSimulation time: " << elapsed.count() << " s\n";
+
 }
 
